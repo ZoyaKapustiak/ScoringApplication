@@ -27,7 +27,7 @@ services:
       - database
 
   database:
-    image: mariadb:11
+    image: mariadb:10.11.2
     container_name: database
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
