@@ -39,24 +39,27 @@ class ScoringCalculateCommand extends Command
 
                 return Command::FAILURE;
             }
-            $clients = [$client];
+            $clientsIds = [$id];
         } else {
-            $clients = $this->clientRepository->findAll();
+            $clientsIds = $this->clientRepository->findAllIds();
         }
-
-        $results = $this->scoringCalculateAction->updateClientsScoring($clients);
-
-        $io->success('Updated successfully!');
+        $clientsChunk = array_chunk($clientsIds, 5);
 
         $io->section('ДЕТАЛИЗАЦИЯ');
 
-        $table = $io->createTable();
-        $table
-            ->setHeaders(['ClientID', 'Total', 'Details'])
-            ->setRows($this->getRowData($results))
-            ->setStyle('default');
+        foreach ($clientsChunk as $chunkIds) {
+            $clients = $this->clientRepository->getByIds($chunkIds);
+            $results = $this->scoringCalculateAction->updateClientsScoring($clients);
 
-        $table->render();
+            $table = $io->createTable();
+            $table
+                ->setHeaders(['ClientID', 'Total', 'Details'])
+                ->setRows($this->getRowData($results))
+                ->setStyle('default');
+
+            $table->render();
+        }
+        $io->success('Updated successfully!');
 
         return Command::SUCCESS;
     }

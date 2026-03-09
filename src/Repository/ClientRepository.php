@@ -12,4 +12,23 @@ class ClientRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Client::class);
     }
+
+    public function findAllIds(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id')
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
+
+    public function getByIds(array $ids): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c')
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
 }
